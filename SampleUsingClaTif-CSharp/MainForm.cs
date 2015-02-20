@@ -66,9 +66,23 @@ namespace SampleUsingClaTif_CSharp
                 if ((int)ClaTiffErr.NoError == res)
                 {
                     // 画像保存ボタンを有効化
+                    // Save Button Enable
                     button_SaveBmp.Enabled = true;
 
-                    // 画像のビット数を表示する
+                    // 画像ピクセルデータ書き出し部分有効化
+                    // textbox for writting pixel data enable
+                    label_ArrayIndex.Enabled   = true;
+                    label_arrIndex.Enabled     = true;
+                    label_pixel.Enabled        = true;
+                    label_PixelValue.Enabled   = true;
+                    label_posX.Enabled         = true;
+                    label_posY.Enabled         = true;
+                    numericUpDown_posX.Enabled = true;
+                    numericUpDown_posY.Enabled = true;
+                    numericUpDown_posX.Maximum = tif.imgData[0].imageWidth-1;
+                    numericUpDown_posY.Maximum = tif.imgData[0].imageLength-1;
+
+                    // 画像のビット数を表示
                     // Check image Bit
                     switch (tif.imgData[0].iImgType)
                     {
@@ -85,10 +99,77 @@ namespace SampleUsingClaTif_CSharp
                             radioButton_32bitGray.Checked = true;
                             break;
                     }
+
                 }
             }
 
         }
+
+        /// <summary>
+        /// numericUpDown_posXの値が変更された
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numericUpDown_posX_ValueChanged(object sender, EventArgs e)
+        {
+            label_ArrayIndex.Text = WriteBufferPos( (int)numericUpDown_posX.Value, (int)numericUpDown_posY.Value);
+            label_PixelValue.Text = WritePixelData( (int)numericUpDown_posX.Value, (int)numericUpDown_posY.Value);
+        }
+
+        /// <summary>
+        /// numericUpDown_posYの値が変更された
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void numericUpDown_posY_ValueChanged(object sender, EventArgs e)
+        {
+            label_ArrayIndex.Text = WriteBufferPos((int)numericUpDown_posX.Value, (int)numericUpDown_posY.Value);
+            label_PixelValue.Text = WritePixelData((int)numericUpDown_posX.Value, (int)numericUpDown_posY.Value);
+        }
+
+       /// <summary>
+       /// 指定位置のピクセルデータを書き出す
+       /// </summary>
+       /// <param name="x">x座標</param>
+       /// <param name="y">y座標</param>
+       /// <returns>文字列化されたピクセルデータ</returns>
+        private string WritePixelData(int x, int y)
+        {
+            string resStr = "";
+
+            // ピクセルデータを書き出す
+            // Write pixel data to label
+            switch (tif.imgData[0].iImgType)
+            {
+                case ImgType.bilevelImg:
+                    resStr = tif.imgData[0].blvImg[x + y * tif.imgData[0].imageWidth].ToString();
+                    break;
+                case ImgType.gryImg_8:
+                    resStr = tif.imgData[0].gryImg_8[x + y * tif.imgData[0].imageWidth].ToString();
+                    break;
+                case ImgType.gryImg_16:
+                    resStr = tif.imgData[0].gryImg_16[x + y * tif.imgData[0].imageWidth].ToString();
+                    break;
+                case ImgType.gryImg_Sgl:
+                    resStr = tif.imgData[0].gryImg_Sgl[x + y * tif.imgData[0].imageWidth].ToString();
+                    break;
+            }
+
+            return resStr;
+        }
+
+        /// <summary>
+        /// 指定位置(x,y)の1次元配列のインデックスを書き出す
+        /// </summary>
+        /// <param name="x">x座標</param>
+        /// <param name="y">y座標</param>
+        /// <returns>文字列化された1次元配列のインデックス</returns>
+        private string WriteBufferPos(int x, int y)
+        {
+            return (x + y * tif.imgData[0].imageWidth).ToString();
+        }
+
+
 
         /// <summary>
         /// Save Bmp Image Using ImageUtil from ClaTif memory array.
@@ -149,5 +230,6 @@ namespace SampleUsingClaTif_CSharp
             }
 
         }
+
     }
 }
